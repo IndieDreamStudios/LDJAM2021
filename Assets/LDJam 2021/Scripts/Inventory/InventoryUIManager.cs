@@ -6,13 +6,20 @@ using UnityEngine.UI;
 
 public class InventoryUIManager : MonoBehaviour
 {
-    List<Transform> itemSlotList = new List<Transform>();
-    int slotActive = 0;
+    public List<Transform> itemSlotList = new List<Transform>();
+    public int slotActive = -1;
+    public bool hasItems = false;
 
     private void Awake()
     {
         if ( Manager.Instance.InventoryUIManager == null)
             Manager.Instance.InventoryUIManager = this;
+        else
+        {
+            slotActive = Manager.Instance.InventoryUIManager.slotActive;
+        }
+
+        
         foreach (Transform item in GetComponentsInChildren<Transform>(true))
         {
             if ( item.name.StartsWith("Item_"))
@@ -20,6 +27,8 @@ public class InventoryUIManager : MonoBehaviour
                 itemSlotList.Add(item);
             }
         }
+
+        
     }
 
     private void Start()
@@ -27,16 +36,31 @@ public class InventoryUIManager : MonoBehaviour
         InputManager.Instance.onN1Pressed.AddListener(SelectSlot1);
         InputManager.Instance.onN2Pressed.AddListener(SelectSlot2);
         Manager.Instance.Player.inventory.inventoryUpdate.AddListener(OnInventoryUpdate);
+        OnInventoryUpdate();
     }
 
     private void SelectSlot1()
     {
+        if ( slotActive == 0 )
+        {
+            slotActive = -1;
+            Deselect();
+            return;
+        }
+
         slotActive = 0;
         SelectSlot("Item_1");
     }
 
     private void SelectSlot2()
     {
+        if (slotActive == 1)
+        {
+            slotActive = -1;
+            Deselect();
+            return;
+        }
+
         slotActive = 1;
         SelectSlot("Item_2");
     }
@@ -47,7 +71,6 @@ public class InventoryUIManager : MonoBehaviour
         {
             if (item.name.StartsWith(item_active))
             {
-                //item.gameObject.SetActive(true);
                 item.gameObject.GetComponent<Image>().color = new Color32(255, 255, 255, 200);
             }
             else
@@ -57,16 +80,39 @@ public class InventoryUIManager : MonoBehaviour
         }
     }
 
+    private void Deselect()
+    {
+        foreach (Transform item in itemSlotList)
+        {
+            if (item.name.StartsWith("Item_"))
+            {
+                item.gameObject.GetComponent<Image>().color = new Color32(255, 255, 255, 100);
+            }
+        }
+    }
+
     private void SetHealthPotions(int count)
     {
         var obj = GetComponentByName("Item_1");
-        Debug.LogWarning(obj);
+        
 
         if (obj != null)
         {
+            Manager.Potions = count;
+            if (count == 0)
+            {
+                slotActive = -1;
+                obj.SetActive(false);
+                Deselect();
+                return;
+            }
+
+
             obj.SetActive(true);
             obj.transform.GetChild(1).GetComponent<TMP_Text>().text = "" + count;
         }
+
+        
     }
 
     private void SetKeys(int count)
@@ -81,11 +127,15 @@ public class InventoryUIManager : MonoBehaviour
 
     private void OnInventoryUpdate()
     {
+        if (Manager.Instance.Player.inventory.Inventory.Count <= 0) return;
         if (Manager.Instance.Player.inventory.Inventory.ContainsKey(CollectableTypes.HealthPot))
             SetHealthPotions(Manager.Instance.Player.inventory.Inventory[CollectableTypes.HealthPot]);
 
         if (Manager.Instance.Player.inventory.Inventory.ContainsKey(CollectableTypes.Key))
             SetKeys(Manager.Instance.Player.inventory.Inventory[CollectableTypes.Key]);
+
+        if (Manager.Instance.Player.inventory.Inventory.Count > 0)
+            hasItems = true;
     }
 
     private GameObject GetComponentByName(string name)

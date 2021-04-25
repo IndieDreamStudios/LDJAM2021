@@ -15,7 +15,7 @@ public class LevelEnd : MonoBehaviour
 
     void HandleLevelEnd()
     {
-        image.CrossFadeAlpha(0.5f, Duration, false);
+        image.CrossFadeAlpha(1, Duration, false);
         
         StartCoroutine(Fade());
     }

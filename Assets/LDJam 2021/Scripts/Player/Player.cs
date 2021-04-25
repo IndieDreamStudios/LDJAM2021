@@ -32,9 +32,20 @@ public class Player : LivingEntity
     {
         Manager.Lose = false;
         animator = GetComponent<Animator>();
+
         inventory = GetComponent<PlayerInventory>();
+
+
+        if (Manager.Potions != 0)
+        {
+            Debug.LogWarning("here");
+            inventory.Inventory.Add(CollectableTypes.HealthPot, Manager.Potions);
+        }
+
+        Manager.Instance.Player = this;
+
         attack = GetComponent<PlayerAttack>();
-        InputManager.Instance.onMouseLeftButtonPressed.AddListener(Attack);
+        InputManager.Instance.onMouseLeftButtonPressed.AddListener(HandleMouse);
         Manager.Instance.Player = this;
 
         Manager.LevelEnd.AddListener(HandleLevelEnd);
@@ -96,6 +107,21 @@ public class Player : LivingEntity
         animator.SetBool("HasSword", HasSword);
     }
 
+    void HandleMouse()
+    {
+        if (Manager.Instance.InventoryUIManager.slotActive != -1)
+        {
+            UseItem();
+
+        }
+        else
+        {
+            Attack();
+
+        }
+    }
+
+
     GameObject target = null;
     void Attack()
     {
@@ -152,9 +178,41 @@ public class Player : LivingEntity
         rb.MovePosition(rb.position + movement * speed * Time.deltaTime);
     }
 
+    public void UseItem()
+    {
+        if(Manager.Instance.InventoryUIManager.slotActive == 0)
+        {
+            // Use Pot
+            if ( health < 100f)
+            {
+                if ( inventory.Inventory[CollectableTypes.HealthPot] > 0)
+                {
+                    inventory.UseCollectable(CollectableTypes.HealthPot);
+                    Heal(25f);
+                }
+                
+            }
+            
+        }
+        else if (Manager.Instance.InventoryUIManager.slotActive == 1)
+        {
+            // Use Key
+           //inventory.UseCollectable(CollectableTypes.Key);
+        }
+    }
+
     private void HandleLevelEnd()
     {
         IsGoingToNextLevel = true;
+    }
+
+    public void Heal(float amount)
+    {
+        if (health + amount < 100f)
+            health += amount;
+        else
+            health = 100f;
+        onPlayerTakeDamage?.Invoke();
     }
 
 

@@ -37,6 +37,8 @@ public class Manager : MonoBehaviour
         get { return player; }
         set { player = value; }
     }
+
+    public static int Potions = 0;
     #endregion
 
     #region InventoryUIManager
