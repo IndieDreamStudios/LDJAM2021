@@ -27,7 +27,9 @@ public class Manager : MonoBehaviour
     #endregion
 
     public static UnityEvent OnLose = new UnityEvent();
+    public static UnityEvent OnWin = new UnityEvent();
     public static bool Lose = false;
+    public static bool Win = false;
 
     #region Player
     private Player player;
@@ -71,5 +73,6 @@ public class Manager : MonoBehaviour
         uiManager = null;
         player = null;
         Lose = false;
+        Win = false;
     }
 }

@@ -19,9 +19,11 @@ public class Boss : LivingEntity
     float TimerToAttack = 2.0f;
     float timeToAttack = 0.0f;
 
+
     // Start is called before the first frame update
     void Start()
     {
+        damageValue = 50f;
         anim = GetComponent<Animator>();
         attack = GetComponent<EnemyAttack>();
         agent.updateRotation = false;
@@ -32,6 +34,7 @@ public class Boss : LivingEntity
     // Update is called once per frame
     void Update()
     {
+        if (Manager.Win) return;
         if (Manager.Lose) return;
         if (isFollowing)
         {
@@ -101,7 +104,6 @@ public class Boss : LivingEntity
 
         if (isDead)
         {
-            // Play Dead Sound
             AudioManager.Instance.Play("Enemy_Die");
 
             StartCoroutine(DestroyMe());

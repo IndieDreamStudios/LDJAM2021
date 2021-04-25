@@ -38,7 +38,6 @@ public class Player : LivingEntity
 
         if (Manager.Potions != 0)
         {
-            Debug.LogWarning("here");
             inventory.Inventory.Add(CollectableTypes.HealthPot, Manager.Potions);
         }
 
@@ -196,9 +195,22 @@ public class Player : LivingEntity
         }
         else if (Manager.Instance.InventoryUIManager.slotActive == 1)
         {
-            // Use Key
-           //inventory.UseCollectable(CollectableTypes.Key);
+            // Detect if colliding to brother
+            if (inventory.Inventory[CollectableTypes.HealthPot] > 0)
+            {
+                inventory.UseCollectable(CollectableTypes.Key);
+                Manager.Win = true;
+                StartCoroutine(WinGame());
+            }
+                
         }
+    }
+
+    private IEnumerator WinGame()
+    {
+        yield return new WaitForSeconds(2f);
+        Manager.OnWin?.Invoke();
+
     }
 
     private void HandleLevelEnd()
