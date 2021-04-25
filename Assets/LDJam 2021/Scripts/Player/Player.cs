@@ -196,7 +196,7 @@ public class Player : LivingEntity
         else if (Manager.Instance.InventoryUIManager.slotActive == 1)
         {
             // Detect if colliding to brother
-            if (inventory.Inventory[CollectableTypes.HealthPot] > 0)
+            if (inventory.Inventory[CollectableTypes.Key] > 0)
             {
                 inventory.UseCollectable(CollectableTypes.Key);
                 Manager.Win = true;
@@ -208,7 +208,7 @@ public class Player : LivingEntity
 
     private IEnumerator WinGame()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
         Manager.OnWin?.Invoke();
 
     }

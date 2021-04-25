@@ -5,7 +5,7 @@ using UnityEngine;
 public class EndGame : MonoBehaviour
 {
     public static EndGame Instance { get; private set; }
-    private GameObject EndScreen;
+    [SerializeField] private GameObject EndScreen;
 
     // Start is called before the first frame update
     void Start()
